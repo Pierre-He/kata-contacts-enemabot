@@ -75,7 +75,16 @@ def main():
     num_contacts = int(sys.argv[1])
     db_path = Path("./contacts.sqlite3")
     contacts = Contacts(db_path)
-    contacts.insert_contacts(yield_contacts(num_contacts))
+    
+    # Insert contacts in batches
+    start_time = datetime.now()
+    batch_size = 1000
+    print("Insert with batch size of " + str(batch_size))
+    for i in range(0, num_contacts, batch_size):
+        contacts.insert_contacts(yield_contacts(batch_size, i))
+    end_time = datetime.now()
+    elapsed = end_time - start_time
+    print("Total time taken to insert contacts:", elapsed.microseconds / 1000, "ms")
     charlie = contacts.get_name_for_email(f"email-{num_contacts}@domain.tld")
 
 

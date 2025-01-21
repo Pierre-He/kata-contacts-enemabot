@@ -26,7 +26,21 @@ class Contacts:
 
     def insert_contacts(self, contacts):
         print("Inserting contacts ...")
-        # TODO
+        # Done
+        cursor = self.connection.cursor()
+        start = datetime.now()
+        cursor.executemany(
+            """
+            INSERT INTO contacts(name, email)
+            VALUES(?, ?)
+            """,
+            contacts,
+        )
+        self.connection.commit()
+        end = datetime.now()
+        elapsed = end - start
+        print("insert took", elapsed.microseconds / 1000, "ms")
+
 
     def get_name_for_email(self, email):
         print("Looking for email", email)
@@ -52,21 +66,29 @@ class Contacts:
             print("Not found")
 
 
+# Done
 def yield_contacts(num_contacts):
-    # TODO: Generate a lot of contacts
-    # instead of just 3
-    yield ("name-1", "email-1@domain.tld")
-    yield ("name-2", "email-2@domain.tld")
-    yield ("name-3", "email-3@domain.tld")
+     yield from ((f"name-{i+1}", f"email-{i+1}@domain.tld") for i in range(num_contacts))
 
 
 def main():
     num_contacts = int(sys.argv[1])
-    db_path = Path("contacts.sqlite3")
+    db_path = Path("./contacts.sqlite3")
     contacts = Contacts(db_path)
     contacts.insert_contacts(yield_contacts(num_contacts))
     charlie = contacts.get_name_for_email(f"email-{num_contacts}@domain.tld")
 
 
 if __name__ == "__main__":
-    main()
+    choice = 0
+    if choice == 0:
+        main()
+    elif choice == 1:
+        # Truncate the db : keep the schema without rows
+        db_path = Path("./contacts.sqlite3")
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM contacts")
+        connection.commit()
+        connection.close()
+

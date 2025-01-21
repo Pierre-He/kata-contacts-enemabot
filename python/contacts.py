@@ -67,8 +67,8 @@ class Contacts:
 
 
 # Done
-def yield_contacts(num_contacts):
-     yield from ((f"name-{i+1}", f"email-{i+1}@domain.tld") for i in range(num_contacts))
+def yield_contacts(num_contacts, offset=0):
+     yield from ((f"name-{i+1+offset}", f"email-{i+1+offset}@domain.tld") for i in range(num_contacts))
 
 
 def main():
